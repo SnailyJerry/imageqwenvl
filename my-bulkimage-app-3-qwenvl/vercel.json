@@ -1,7 +1,23 @@
 {
+  "version": 2,
   "name": "my-bulkimage-app",
-  "version": "1.0.0",
-  "scripts": {
-    "start": "vercel dev"
+  "builds": [
+    {
+      "src": "index.html",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "headers": {
+        "Access-Control-Allow-Origin": "*",  // 允许跨域
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Authorization, Content-Type"
+      }
+    }
+  ],
+  "env": {
+    "DASHSCOPE_API_KEY": "@dascope-api-key"  // 将此替换为你的环境变量名称
   }
 }
