@@ -1,7 +1,18 @@
 {
   "name": "my-bulkimage-app",
   "version": "1.0.0",
+  "description": "A bulk image processing app using Qwen-VL API",
   "scripts": {
-    "start": "vercel dev"
-  }
+    "start": "vercel dev",  // 本地开发时启动 vercel 开发服务器
+    "build": "vercel build",  // 构建项目
+    "deploy": "vercel --prod"  // 部署到生产环境
+  },
+  "dependencies": {
+    "vercel": "^27.0.0"  // 确保安装了最新的 Vercel CLI 工具
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=14.0.0"  // 确保使用适合的 Node.js 版本
+  },
+  "license": "MIT"
 }
