@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图像批量处理</title>
+    <link rel="stylesheet" href="style.css"> <!-- 引入样式表 -->
+</head>
+<body>
+    <h1>批量图像处理工具</h1>
+
+    <div>
+        <label for="apiKey">API Key:</label>
+        <input type="text" id="apiKey" placeholder="请输入你的API密钥">
+    </div>
+
+    <div>
+        <label for="prompt">Prompt:</label>
+        <textarea id="prompt" placeholder="请输入提示词"></textarea>
+    </div>
+
+    <div>
+        <label for="files">选择图片文件:</label>
+        <input type="file" id="files" multiple>
+    </div>
+
+    <button id="submitBtn">提交</button>
+
+    <script src="script.js"></script> <!-- 引入JavaScript文件 -->
+</body>
+</html>
