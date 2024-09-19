@@ -1,38 +1,12 @@
 {
-  "version": 2,
   "name": "my-bulkimage-app",
-  "builds": [
-    {
-      "src": "index.html",
-      "use": "@vercel/static"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",  // 捕获所有路由
-      "dest": "/index.html"
-    }
-  ],
-  "headers": [
-    {
-      "source": "/(.*)",  // 为所有请求添加CORS头部
-      "headers": [
-        {
-          "key": "Access-Control-Allow-Origin",
-          "value": "*"
-        },
-        {
-          "key": "Access-Control-Allow-Methods",
-          "value": "GET, POST, OPTIONS"
-        },
-        {
-          "key": "Access-Control-Allow-Headers",
-          "value": "Authorization, Content-Type"
-        }
-      ]
-    }
-  ],
-  "env": {
-    "DASHSCOPE_API_KEY": "@dascope-api-key"  // 确保Vercel中已正确配置环境变量
+  "version": "1.0.0",
+  "scripts": {
+    "start": "vercel dev",  // 本地开发服务器
+    "build": "vercel build",  // 构建项目
+    "deploy": "vercel --prod"  // 部署到生产环境
+  },
+  "dependencies": {
+    "vercel": "^27.0.0"  // 确保使用了最新的Vercel CLI
   }
 }
