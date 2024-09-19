@@ -17,7 +17,7 @@ document.getElementById('submitBtn').addEventListener('click', function() {
     });
 
     // API URL 变更为通义千问VL
-    const apiUrl = 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions';
+    const apiUrl = 'https://dashscope.aliyuncs.com/compatible-mode/v1';
 
     // 遍历上传的所有文件
     const processImages = async () => {
