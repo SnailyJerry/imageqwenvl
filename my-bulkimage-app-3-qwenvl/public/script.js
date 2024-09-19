@@ -17,7 +17,7 @@ document.getElementById('submitBtn').addEventListener('click', function() {
   });
 
   // API URL 变更为通义千问VL
-  const apiUrl = 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions';
+  const apiUrl = 'https://dashscope.aliyuncs.com/compatible-mode/v1';
 
   // 遍历上传的所有文件
   const processImages = async () => {
@@ -28,7 +28,7 @@ document.getElementById('submitBtn').addEventListener('click', function() {
               
               // 构建请求体
               const body = {
-                  model: "qwen-vl-max",  // 可根据需要选择具体的模型
+                  model: "qwen-vl-max-0809",  // 可根据需要选择具体的模型
                   messages: [
                       {
                           role: "user",
