@@ -9,8 +9,30 @@
   ],
   "routes": [
     {
-      "src": "/(.*)",
+      "src": "/(.*)",  // 捕获所有路由
       "dest": "/index.html"
     }
-  ]
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",  // 为所有请求添加CORS头部
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET, POST, OPTIONS"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "Authorization, Content-Type"
+        }
+      ]
+    }
+  ],
+  "env": {
+    "DASHSCOPE_API_KEY": "@dascope-api-key"  // 确保Vercel中已正确配置环境变量
+  }
 }
