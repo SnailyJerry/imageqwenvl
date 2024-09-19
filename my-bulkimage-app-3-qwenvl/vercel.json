@@ -10,14 +10,7 @@
   "routes": [
     {
       "src": "/(.*)",
-      "headers": {
-        "Access-Control-Allow-Origin": "*",  // 允许跨域
-        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-        "Access-Control-Allow-Headers": "Authorization, Content-Type"
-      }
+      "dest": "/index.html"
     }
-  ],
-  "env": {
-    "DASHSCOPE_API_KEY": "@dascope-api-key"  // 将此替换为你的环境变量名称
-  }
+  ]
 }
