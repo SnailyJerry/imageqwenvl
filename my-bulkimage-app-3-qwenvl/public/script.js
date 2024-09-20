@@ -6,7 +6,7 @@ let savedMaxTokens = 300;
 // 处理系统设置按钮的显示与隐藏
 document.getElementById('systemSettingsBtn').addEventListener('click', function() {
     const systemSettingsPanel = document.getElementById('systemSettingsPanel');
-    systemSettingsPanel.style.display = systemSettingsPanel.style.display === 'none' ? 'block' : 'none';
+    systemSettingsPanel.classList.toggle('hidden'); // 使用 class 来控制显示和隐藏
 });
 
 // 保存 API Key
@@ -15,19 +15,19 @@ document.getElementById('saveApiKey').addEventListener('click', function() {
     savedApiKey = apiKeyInput.value;
     if (savedApiKey) {
         apiKeyInput.value = '';
-        apiKeyInput.style.display = 'none';
-        document.getElementById('saveApiKey').style.display = 'none';
-        document.getElementById('apiKeyStatus').style.display = 'block';
-        document.getElementById('reenterApiKey').style.display = 'block';
+        apiKeyInput.classList.add('hidden');
+        document.getElementById('saveApiKey').classList.add('hidden');
+        document.getElementById('apiKeyStatus').classList.remove('hidden');
+        document.getElementById('reenterApiKey').classList.remove('hidden');
     }
 });
 
 // 重新输入 API Key
 document.getElementById('reenterApiKey').addEventListener('click', function() {
-    document.getElementById('apiKey').style.display = 'block';
-    document.getElementById('saveApiKey').style.display = 'block';
-    document.getElementById('apiKeyStatus').style.display = 'none';
-    document.getElementById('reenterApiKey').style.display = 'none';
+    document.getElementById('apiKey').classList.remove('hidden');
+    document.getElementById('saveApiKey').classList.remove('hidden');
+    document.getElementById('apiKeyStatus').classList.add('hidden');
+    document.getElementById('reenterApiKey').classList.add('hidden');
 });
 
 // 保存系统设置
@@ -51,7 +51,7 @@ document.getElementById('submitBtn').addEventListener('click', function() {
 
     const progressBar = document.getElementById('progressBar');
     const progressContainer = document.getElementById('progressContainer');
-    progressContainer.style.display = 'block';
+    progressContainer.classList.remove('hidden');
     progressBar.value = 0;
 
     let totalTasks = files.length + (imageUrlsInput ? imageUrlsInput.split(' ').length : 0);
@@ -63,7 +63,7 @@ document.getElementById('submitBtn').addEventListener('click', function() {
         progressBar.value = progressPercentage;
         if (completedTasks === totalTasks) {
             document.getElementById('progressText').textContent = '处理完成！';
-            progressContainer.style.display = 'none';
+            progressContainer.classList.add('hidden');
         }
     };
 
@@ -90,88 +90,3 @@ document.getElementById('submitBtn').addEventListener('click', function() {
             } else {
                 handleApiResponse(index, type, "未返回有效结果");
             }
-            updateProgress();
-        })
-        .catch(error => {
-            console.error(`请求 ${type} ${index + 1} 出错:`, error);
-            handleApiResponse(index, type, `错误: ${error.message}`);
-            updateProgress();
-        });
-    };
-
-    const processFiles = () => {
-        for (let i = 0; i < files.length; i++) {
-            const reader = new FileReader();
-            reader.readAsDataURL(files[i]);
-            reader.onload = function () {
-                const base64Image = reader.result.split(',')[1];
-                const formData = {
-                    model: savedModel,
-                    input: {
-                        messages: [
-                            {
-                                role: "user",
-                                content: [
-                                    { image: `data:image/jpeg;base64,${base64Image}` },
-                                    { text: prompt }
-                                ]
-                            }
-                        ]
-                    },
-                    parameters: {
-                        result_format: "message",
-                        max_tokens: parseInt(savedMaxTokens),
-                        detail: savedDetail
-                    }
-                };
-                sendRequest(formData, i, '图片');
-            };
-        }
-    };
-
-    const processUrls = () => {
-        const imageUrls = imageUrlsInput.split(' ');
-        for (let j = 0; j < imageUrls.length; j++) {
-            const formData = {
-                model: savedModel,
-                input: {
-                    messages: [
-                        {
-                            role: "user",
-                            content: [
-                                { image: imageUrls[j] },
-                                { text: prompt }
-                            ]
-                        }
-                    ]
-                },
-                parameters: {
-                    result_format: "message",
-                    max_tokens: parseInt(savedMaxTokens),
-                    detail: savedDetail
-                }
-            };
-            sendRequest(formData, j, '图片链接');
-        }
-    };
-
-    if (files.length > 0) {
-        processFiles();
-    }
-    if (imageUrlsInput) {
-        processUrls();
-    }
-
-    if (files.length === 0 && !imageUrlsInput) {
-        alert('请上传文件或输入图片 URL');
-        progressContainer.style.display = 'none';
-    }
-});
-
-// 一键复制结果
-document.getElementById('copyResultsBtn').addEventListener('click', function() {
-    const resultsText = document.getElementById('resultContainer').textContent;
-    navigator.clipboard.writeText(resultsText)
-        .then(() => alert('所有结果已复制！'))
-        .catch(err => console.error('复制失败: ', err));
-});
