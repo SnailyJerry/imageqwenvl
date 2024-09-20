@@ -1,12 +1,12 @@
 {
-  "name": "my-bulkimage-app",
-  "version": "1.0.0",
-  "scripts": {
-    "start": "vercel dev",  // 本地开发服务器
-    "build": "vercel build",  // 构建项目
-    "deploy": "vercel --prod"  // 部署到生产环境
-  },
-  "dependencies": {
-    "vercel": "^27.0.0"  // 确保使用了最新的Vercel CLI
+  "version": 2,
+  "builds": [
+    { "src": "public/**", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "/(.*)", "dest": "/public/$1" }
+  ],
+  "env": {
+    "API_KEY": "@api-key-secret"
   }
 }
