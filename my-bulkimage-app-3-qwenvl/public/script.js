@@ -1,83 +1,177 @@
+let savedApiKey = '';
+let savedModel = 'qwen-vl-max';
+let savedDetail = 'auto';
+let savedMaxTokens = 300;
+
+// 处理系统设置按钮的显示与隐藏
+document.getElementById('systemSettingsBtn').addEventListener('click', function() {
+    const systemSettingsPanel = document.getElementById('systemSettingsPanel');
+    systemSettingsPanel.style.display = systemSettingsPanel.style.display === 'none' ? 'block' : 'none';
+});
+
+// 保存 API Key
+document.getElementById('saveApiKey').addEventListener('click', function() {
+    const apiKeyInput = document.getElementById('apiKey');
+    savedApiKey = apiKeyInput.value;
+    if (savedApiKey) {
+        apiKeyInput.value = '';
+        apiKeyInput.style.display = 'none';
+        document.getElementById('saveApiKey').style.display = 'none';
+        document.getElementById('apiKeyStatus').style.display = 'block';
+        document.getElementById('reenterApiKey').style.display = 'block';
+    }
+});
+
+// 重新输入 API Key
+document.getElementById('reenterApiKey').addEventListener('click', function() {
+    document.getElementById('apiKey').style.display = 'block';
+    document.getElementById('saveApiKey').style.display = 'block';
+    document.getElementById('apiKeyStatus').style.display = 'none';
+    document.getElementById('reenterApiKey').style.display = 'none';
+});
+
+// 保存系统设置
+document.getElementById('saveSettings').addEventListener('click', function() {
+    savedModel = document.getElementById('modelSelect').value;
+    savedDetail = document.getElementById('detailSelect').value;
+    savedMaxTokens = document.getElementById('maxTokens').value;
+    alert('系统设置已保存！');
+});
+
+// 提交按钮事件处理
 document.getElementById('submitBtn').addEventListener('click', function() {
-    const apiKey = document.getElementById('apiKey').value;
     const prompt = document.getElementById('prompt').value;
     const files = document.getElementById('files').files;
+    const imageUrlsInput = document.getElementById('imageUrls').value.trim();
 
-    if (!apiKey || !prompt || files.length === 0) {
-        alert('请填写所有字段并选择图片文件。');
-        return;
-    }
+    const apiUrl = 'https://dashscope.aliyuncs.com/api/v1/services/vision/image-chat/chat-completion';
 
-    // 将每个文件转换为Base64编码
-    const toBase64 = (file) => new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result.split(",")[1]); // 返回Base64部分
-        reader.onerror = error => reject(error);
-    });
+    const resultContainer = document.getElementById('resultContainer');
+    resultContainer.innerHTML = '';
 
-    // API URL 变更为通义千问VL
-    const apiUrl = 'https://dashscope.aliyuncs.com/compatible-mode/v1';
+    const progressBar = document.getElementById('progressBar');
+    const progressContainer = document.getElementById('progressContainer');
+    progressContainer.style.display = 'block';
+    progressBar.value = 0;
 
-    // 遍历上传的所有文件
-    const processImages = async () => {
-        try {
-            const images = [];
-            for (let i = 0; i < files.length; i++) {
-                const base64Image = await toBase64(files[i]);
-                images.push({
-                    type: "image_url",
-                    image_url: {
-                        url: `data:image/jpeg;base64,${base64Image}` // Base64编码的图片数据
-                    }
-                });
-            }
+    let totalTasks = files.length + (imageUrlsInput ? imageUrlsInput.split(' ').length : 0);
+    let completedTasks = 0;
 
-            // 构建请求体
-            const body = {
-                model: "qwen-vl-max-0809",  // 根据需要选择具体的模型
-                messages: [
-                    {
-                        role: "user",
-                        content: [
-                            { type: "text", text: prompt },  // 加入用户的文本提示
-                            ...images  // 添加图片数据
-                        ]
-                    }
-                ],
-                top_p: 0.8,  // 可选参数，影响模型输出多样性
-                stream: true,  // 开启流式输出
-                stream_options: { "include_usage": true }  // 包含使用情况
-            };
-
-            // 发送请求到通义千问VL API
-            const response = await fetch(apiUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${apiKey}`  // 使用用户输入的API Key
-                },
-                body: JSON.stringify(body)
-            });
-
-            // 处理流式响应
-            const reader = response.body.getReader();
-            const decoder = new TextDecoder("utf-8");
-
-            while (true) {
-                const { done, value } = await reader.read();
-                if (done) break;
-                const text = decoder.decode(value);
-                console.log(text);  // 处理流式数据
-                alert(`API返回: ${text}`);
-            }
-
-        } catch (error) {
-            console.error('错误:', error);
-            alert('请求失败，请检查API密钥或网络连接。');
+    const updateProgress = () => {
+        completedTasks++;
+        let progressPercentage = (completedTasks / totalTasks) * 100;
+        progressBar.value = progressPercentage;
+        if (completedTasks === totalTasks) {
+            document.getElementById('progressText').textContent = '处理完成！';
+            progressContainer.style.display = 'none';
         }
     };
 
-    // 调用图片处理函数
-    processImages();
+    const handleApiResponse = (index, type, interpretation) => {
+        const resultElement = document.createElement('p');
+        resultElement.textContent = `${type} ${index + 1} 结果: ${interpretation}`;
+        resultContainer.appendChild(resultElement);
+    };
+
+    const sendRequest = (formData, index, type) => {
+        fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${savedApiKey}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.output && data.output.choices && data.output.choices.length > 0) {
+                const interpretation = data.output.choices[0].message.content[0].text;
+                handleApiResponse(index, type, interpretation);
+            } else {
+                handleApiResponse(index, type, "未返回有效结果");
+            }
+            updateProgress();
+        })
+        .catch(error => {
+            console.error(`请求 ${type} ${index + 1} 出错:`, error);
+            handleApiResponse(index, type, `错误: ${error.message}`);
+            updateProgress();
+        });
+    };
+
+    const processFiles = () => {
+        for (let i = 0; i < files.length; i++) {
+            const reader = new FileReader();
+            reader.readAsDataURL(files[i]);
+            reader.onload = function () {
+                const base64Image = reader.result.split(',')[1];
+                const formData = {
+                    model: savedModel,
+                    input: {
+                        messages: [
+                            {
+                                role: "user",
+                                content: [
+                                    { image: `data:image/jpeg;base64,${base64Image}` },
+                                    { text: prompt }
+                                ]
+                            }
+                        ]
+                    },
+                    parameters: {
+                        result_format: "message",
+                        max_tokens: parseInt(savedMaxTokens),
+                        detail: savedDetail
+                    }
+                };
+                sendRequest(formData, i, '图片');
+            };
+        }
+    };
+
+    const processUrls = () => {
+        const imageUrls = imageUrlsInput.split(' ');
+        for (let j = 0; j < imageUrls.length; j++) {
+            const formData = {
+                model: savedModel,
+                input: {
+                    messages: [
+                        {
+                            role: "user",
+                            content: [
+                                { image: imageUrls[j] },
+                                { text: prompt }
+                            ]
+                        }
+                    ]
+                },
+                parameters: {
+                    result_format: "message",
+                    max_tokens: parseInt(savedMaxTokens),
+                    detail: savedDetail
+                }
+            };
+            sendRequest(formData, j, '图片链接');
+        }
+    };
+
+    if (files.length > 0) {
+        processFiles();
+    }
+    if (imageUrlsInput) {
+        processUrls();
+    }
+
+    if (files.length === 0 && !imageUrlsInput) {
+        alert('请上传文件或输入图片 URL');
+        progressContainer.style.display = 'none';
+    }
+});
+
+// 一键复制结果
+document.getElementById('copyResultsBtn').addEventListener('click', function() {
+    const resultsText = document.getElementById('resultContainer').textContent;
+    navigator.clipboard.writeText(resultsText)
+        .then(() => alert('所有结果已复制！'))
+        .catch(err => console.error('复制失败: ', err));
 });
