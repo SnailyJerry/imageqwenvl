@@ -1,12 +1,18 @@
 {
-  "name": "my-bulkimage-app",
+  "name": "my-bulkimage-app-3-qwenvl",
   "version": "1.0.0",
+  "description": "A web application for bulk image processing using QwenVL API",
+  "main": "public/script.js",
   "scripts": {
-    "start": "vercel dev",  // 本地开发服务器
-    "build": "vercel build",  // 构建项目
-    "deploy": "vercel --prod"  // 部署到生产环境
+    "start": "vercel dev",
+    "build": "echo 'No build step required'",
+    "deploy": "vercel deploy --prod"
   },
-  "dependencies": {
-    "vercel": "^27.0.0"  // 确保你有最新的 Vercel CLI
+  "keywords": ["image processing", "QwenVL", "API", "bulk processing"],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "vercel": "^28.0.0"
   }
 }
