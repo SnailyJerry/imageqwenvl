@@ -4,9 +4,9 @@
   "description": "A web application for bulk image processing using QwenVL API",
   "main": "public/script.js",
   "scripts": {
-    "start": "vercel dev",
-    "build": "echo 'No build step required'",
-    "deploy": "vercel deploy --prod"
+    "dev": "vercel dev",
+    "deploy": "vercel deploy --prod",
+    "build": "echo 'No build step required'"
   },
   "keywords": ["image processing", "QwenVL", "API", "bulk processing"],
   "author": "Your Name",
