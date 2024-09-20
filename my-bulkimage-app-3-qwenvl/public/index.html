@@ -1,31 +1,113 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>图像批量处理工具</title>
-    <link rel="stylesheet" href="style.css">
+    <title>SnailyImageReader - 用文字看见绘本</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1, h2, h3 {
+            color: #2c3e50;
+        }
+        .container {
+            display: flex;
+            justify-content: space-between;
+        }
+        .settings, .results {
+            width: 48%;
+        }
+        input[type="text"], input[type="file"], textarea, select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+    </style>
 </head>
 <body>
-    <h1>批量图像处理工具</h1>
+    <h1>SnailyImageReader</h1>
+    <p>用文字看见绘本</p>
 
-    <div>
-        <label for="apiKey">API Key:</label>
-        <input type="text" id="apiKey" placeholder="请输入你的API密钥">
+    <div class="container">
+        <div class="settings">
+            <h2>上传设置</h2>
+            <button id="systemSettingsBtn">系统设置</button>
+            <div id="systemSettingsPanel" style="display:none;">
+                <h3>系统设置</h3>
+                <div>
+                    <label for="apiKey">API Key:</label>
+                    <input type="text" id="apiKey">
+                    <button id="saveApiKey">保存</button>
+                    <p id="apiKeyStatus" style="display: none;">API Key 已保存并隐藏</p>
+                    <button id="reenterApiKey" style="display: none;">重新输入 API Key</button>
+                </div>
+                <div>
+                    <label for="modelSelect">选择模型:</label>
+                    <select id="modelSelect">
+                        <option value="qwen-vl-max">qwen-vl-max</option>
+                        <option value="qwen-vl-max-0809">qwen-vl-max-0809</option>
+                        <option value="qwen-vl-plus-0809">qwen-vl-plus-0809</option>
+                        <option value="qwen-vl-max-0201">qwen-vl-max-0201</option>
+                        <option value="qwen-vl-plus">qwen-vl-plus</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="detailSelect">精细度:</label>
+                    <select id="detailSelect">
+                        <option value="auto">自动</option>
+                        <option value="low">低</option>
+                        <option value="high">高</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="maxTokens">最大 Tokens:</label>
+                    <input type="number" id="maxTokens" value="300">
+                </div>
+                <button id="saveSettings">保存设置</button>
+            </div>
+            <div>
+                <label for="prompt">Prompt:</label>
+                <textarea id="prompt" rows="4"></textarea>
+            </div>
+            <div>
+                <label for="files">选择图片文件:</label>
+                <input type="file" id="files" multiple accept="image/*">
+            </div>
+            <div>
+                <label for="imageUrls">或输入图片URL链接（用空格隔开）:</label>
+                <input type="text" id="imageUrls">
+            </div>
+            <button id="submitBtn">提交</button>
+            <div id="progressContainer" style="display: none;">
+                <progress id="progressBar" value="0" max="100"></progress>
+                <span id="progressText">正在处理中...</span>
+            </div>
+        </div>
+        <div class="results">
+            <h2>结果</h2>
+            <div id="resultContainer"></div>
+            <button id="copyResultsBtn">一键复制所有结果</button>
+        </div>
     </div>
 
-    <div>
-        <label for="prompt">Prompt:</label>
-        <textarea id="prompt" placeholder="请输入提示词"></textarea>
-    </div>
-
-    <div>
-        <label for="files">选择图片文件:</label>
-        <input type="file" id="files" multiple>
-    </div>
-
-    <button id="submitBtn">提交</button>
-
-    <script src="script.js"></script> <!-- 引入JavaScript文件 -->
+    <script>
+        // 这里将插入之前提供的JavaScript代码
+    </script>
 </body>
 </html>
