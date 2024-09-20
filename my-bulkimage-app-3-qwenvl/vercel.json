@@ -1,14 +1,13 @@
 {
-  "version": 2,
-  "builds": [
-    { "src": "public/**", "use": "@vercel/static" }
-  ],
-  "routes": [
-    { "handle": "filesystem" },
-    { "src": "/", "dest": "/public/index.html" },
-    { "src": "/(.*)", "dest": "/public/$1" }
-  ],
-  "env": {
-    "API_KEY": "@api-key-secret"
-  }
-}
+     "version": 2,
+     "builds": [
+       { "src": "public/**", "use": "@vercel/static" }
+     ],
+     "routes": [
+       { "src": "/(.*)", "dest": "/public/$1" },
+       { "src": "/", "dest": "/public/index.html" }
+     ],
+     "env": {
+       "API_KEY": "@api-key-secret"
+     }
+   }
