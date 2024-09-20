@@ -44,12 +44,13 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // 提交按钮事件处理
-    document.getElementById('submitBtn').addEventListener('click', function() {
+    document.getElementById('submitBtn').addEventListener('click', async function() {
         const prompt = document.getElementById('prompt').value;
         const files = document.getElementById('files').files;
         const imageUrlsInput = document.getElementById('imageUrls').value.trim();
 
-        const apiUrl = 'https://dashscope.aliyuncs.com/api/v1/services/vision/image-chat/chat-completion';
+        // 更新 API URL 为你给出的 endpoint
+        const apiUrl = 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions';
 
         const resultContainer = document.getElementById('resultContainer');
         resultContainer.innerHTML = '';
@@ -78,41 +79,44 @@ document.addEventListener('DOMContentLoaded', function() {
             resultContainer.appendChild(resultElement);
         };
 
-        const sendRequest = (formData, index, type) => {
-            fetch(apiUrl, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${savedApiKey}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(formData)
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.output && data.output.choices && data.output.choices.length > 0) {
-                    const interpretation = data.output.choices[0].message.content[0].text;
+        const sendRequest = async (formData, index, type) => {
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${savedApiKey}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (data.choices && data.choices.length > 0) {
+                    const interpretation = data.choices[0].message.content;
                     handleApiResponse(index, type, interpretation);
                 } else {
                     handleApiResponse(index, type, "未返回有效结果");
                 }
+
                 updateProgress();
-            })
-            .catch(error => {
+            } catch (error) {
                 console.error(`请求 ${type} ${index + 1} 出错:`, error);
                 handleApiResponse(index, type, `错误: ${error.message}`);
                 updateProgress();
-            });
+            }
         };
 
+        // 并发处理文件请求
         const processFiles = () => {
-            for (let i = 0; i < files.length; i++) {
-                const reader = new FileReader();
-                reader.readAsDataURL(files[i]);
-                reader.onload = function () {
-                    const base64Image = reader.result.split(',')[1];
-                    const formData = {
-                        model: savedModel,
-                        input: {
+            return Array.from(files).map((file, index) => {
+                return new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(file);
+                    reader.onload = function () {
+                        const base64Image = reader.result.split(',')[1];
+                        const formData = {
+                            model: savedModel,
                             messages: [
                                 {
                                     role: "user",
@@ -121,51 +125,43 @@ document.addEventListener('DOMContentLoaded', function() {
                                         { text: prompt }
                                     ]
                                 }
-                            ]
-                        },
-                        parameters: {
-                            result_format: "message",
+                            ],
                             max_tokens: parseInt(savedMaxTokens),
                             detail: savedDetail
-                        }
+                        };
+                        resolve(sendRequest(formData, index, '图片'));
                     };
-                    sendRequest(formData, i, '图片');
-                };
-            }
+                });
+            });
         };
 
+        // 并发处理URL请求
         const processUrls = () => {
             const imageUrls = imageUrlsInput.split(' ');
-            for (let j = 0; j < imageUrls.length; j++) {
+            return imageUrls.map((url, index) => {
                 const formData = {
                     model: savedModel,
-                    input: {
-                        messages: [
-                            {
-                                role: "user",
-                                content: [
-                                    { image: imageUrls[j] },
-                                    { text: prompt }
-                                ]
-                            }
-                        ]
-                    },
-                    parameters: {
-                        result_format: "message",
-                        max_tokens: parseInt(savedMaxTokens),
-                        detail: savedDetail
-                    }
+                    messages: [
+                        {
+                            role: "user",
+                            content: [
+                                { image: url },
+                                { text: prompt }
+                            ]
+                        }
+                    ],
+                    max_tokens: parseInt(savedMaxTokens),
+                    detail: savedDetail
                 };
-                sendRequest(formData, j, '图片链接');
-            }
+                return sendRequest(formData, index, '图片链接');
+            });
         };
 
-        if (files.length > 0) {
-            processFiles();
-        }
-        if (imageUrlsInput) {
-            processUrls();
-        }
+        const filePromises = processFiles();
+        const urlPromises = processUrls();
+
+        // 并发处理所有请求
+        await Promise.all([...filePromises, ...urlPromises]);
 
         if (files.length === 0 && !imageUrlsInput) {
             alert('请上传文件或输入图片 URL');
