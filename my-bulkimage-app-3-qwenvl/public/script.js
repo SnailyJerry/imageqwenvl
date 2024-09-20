@@ -1,19 +1,9 @@
-// 确保页面 DOM 加载完成后执行 JavaScript
 document.addEventListener('DOMContentLoaded', function() {
 
     let savedApiKey = '';
     let savedModel = 'qwen-vl-max';
     let savedDetail = 'auto';
     let savedMaxTokens = 300;
-
-    // 处理系统设置按钮的显示与隐藏
-    document.getElementById('systemSettingsBtn').addEventListener('click', function() {
-        console.log("系统设置按钮被点击");  // 用于调试
-        const systemSettingsPanel = document.getElementById('systemSettingsPanel');
-        
-        // 切换显示/隐藏状态
-        systemSettingsPanel.classList.toggle('hidden'); // 使用 class 来控制显示和隐藏
-    });
 
     // 保存 API Key
     document.getElementById('saveApiKey').addEventListener('click', function() {
@@ -25,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('saveApiKey').classList.add('hidden');
             document.getElementById('apiKeyStatus').classList.remove('hidden');
             document.getElementById('reenterApiKey').classList.remove('hidden');
-            console.log("API Key 已保存");  // 用于调试
+            console.log("API Key 已保存");
         } else {
             alert('请输入有效的 API Key');
         }
@@ -37,7 +27,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('saveApiKey').classList.remove('hidden');
         document.getElementById('apiKeyStatus').classList.add('hidden');
         document.getElementById('reenterApiKey').classList.add('hidden');
-        console.log("重新输入 API Key");  // 用于调试
+        console.log("重新输入 API Key");
     });
 
     // 保存系统设置
@@ -50,7 +40,7 @@ document.addEventListener('DOMContentLoaded', function() {
             model: savedModel,
             detail: savedDetail,
             maxTokens: savedMaxTokens
-        });  // 用于调试
+        });
     });
 
     // 提交按钮事件处理
