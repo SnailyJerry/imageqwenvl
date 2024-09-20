@@ -90,3 +90,88 @@ document.getElementById('submitBtn').addEventListener('click', function() {
             } else {
                 handleApiResponse(index, type, "未返回有效结果");
             }
+            updateProgress();
+        })
+        .catch(error => {
+            console.error(`请求 ${type} ${index + 1} 出错:`, error);
+            handleApiResponse(index, type, `错误: ${error.message}`);
+            updateProgress();
+        });
+    };
+
+    const processFiles = () => {
+        for (let i = 0; i < files.length; i++) {
+            const reader = new FileReader();
+            reader.readAsDataURL(files[i]);
+            reader.onload = function () {
+                const base64Image = reader.result.split(',')[1];
+                const formData = {
+                    model: savedModel,
+                    input: {
+                        messages: [
+                            {
+                                role: "user",
+                                content: [
+                                    { image: `data:image/jpeg;base64,${base64Image}` },
+                                    { text: prompt }
+                                ]
+                            }
+                        ]
+                    },
+                    parameters: {
+                        result_format: "message",
+                        max_tokens: parseInt(savedMaxTokens),
+                        detail: savedDetail
+                    }
+                };
+                sendRequest(formData, i, '图片');
+            };
+        }
+    };
+
+    const processUrls = () => {
+        const imageUrls = imageUrlsInput.split(' ');
+        for (let j = 0; j < imageUrls.length; j++) {
+            const formData = {
+                model: savedModel,
+                input: {
+                    messages: [
+                        {
+                            role: "user",
+                            content: [
+                                { image: imageUrls[j] },
+                                { text: prompt }
+                            ]
+                        }
+                    ]
+                },
+                parameters: {
+                    result_format: "message",
+                    max_tokens: parseInt(savedMaxTokens),
+                    detail: savedDetail
+                }
+            };
+            sendRequest(formData, j, '图片链接');
+        }
+    };
+
+    if (files.length > 0) {
+        processFiles();
+    }
+    if (imageUrlsInput) {
+        processUrls();
+    }
+
+    if (files.length === 0 && !imageUrlsInput) {
+        alert('请上传文件或输入图片 URL');
+        progressContainer.classList.add('hidden');
+    }
+});
+
+// 一键复制结果
+document.getElementById('copyResultsBtn').addEventListener('click', function() {
+    const resultsText = document.getElementById('resultContainer').textContent;
+    navigator.clipboard.writeText(resultsText)
+        .then(() => alert('所有结果已复制！'))
+        .catch(err => console.error('复制失败: ', err));
+});
