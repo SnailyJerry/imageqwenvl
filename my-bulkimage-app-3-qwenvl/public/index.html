@@ -38,6 +38,19 @@
         button:hover {
             background-color: #2980b9;
         }
+        #progressContainer {
+            margin-top: 20px;
+        }
+        #progressBar {
+            width: 100%;
+        }
+        #systemSettingsPanel {
+            display: none;
+            margin-top: 20px;
+        }
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -48,14 +61,14 @@
         <div class="settings">
             <h2>上传设置</h2>
             <button id="systemSettingsBtn">系统设置</button>
-            <div id="systemSettingsPanel" style="display:none;">
+            <div id="systemSettingsPanel" class="hidden">
                 <h3>系统设置</h3>
                 <div>
                     <label for="apiKey">API Key:</label>
                     <input type="text" id="apiKey">
                     <button id="saveApiKey">保存</button>
-                    <p id="apiKeyStatus" style="display: none;">API Key 已保存并隐藏</p>
-                    <button id="reenterApiKey" style="display: none;">重新输入 API Key</button>
+                    <p id="apiKeyStatus" class="hidden">API Key 已保存并隐藏</p>
+                    <button id="reenterApiKey" class="hidden">重新输入 API Key</button>
                 </div>
                 <div>
                     <label for="modelSelect">选择模型:</label>
@@ -94,7 +107,7 @@
                 <input type="text" id="imageUrls">
             </div>
             <button id="submitBtn">提交</button>
-            <div id="progressContainer" style="display: none;">
+            <div id="progressContainer" class="hidden">
                 <progress id="progressBar" value="0" max="100"></progress>
                 <span id="progressText">正在处理中...</span>
             </div>
@@ -106,8 +119,7 @@
         </div>
     </div>
 
-    <script>
-        // 这里将插入之前提供的JavaScript
-    </script>
+    <!-- 引用外部 JavaScript -->
+    <script src="script.js"></script>
 </body>
 </html>
